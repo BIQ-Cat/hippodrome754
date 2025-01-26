@@ -3,7 +3,6 @@ import pygame as pg
 from state import State
 from render import Render
 
-
 if __name__ == '__main__':
     pg.init()
 
@@ -20,7 +19,7 @@ if __name__ == '__main__':
                 running = False
 
         render.draw()
-        
+
         clock.tick(state.FPS)
         pg.display.flip()
 
