@@ -15,11 +15,11 @@ class State:
 
     def __init__(self):
         self.camera = {
-            "x": 0.0,
-            "y": 0.0,
+            "x": -40.0,
+            "y": -80.0,
             "angle": math.pi / 4,
             "height": 270,
-            "pitch": 40,
+            "pitch": 20,
         }
 
         self.color_map_path = self.MAP_DIR / "color_map.jpg"

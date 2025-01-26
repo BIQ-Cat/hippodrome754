@@ -98,6 +98,7 @@ func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeig
 
 	for i := 0; i < int(screen.width); i++ {
 		go castRay(i, camera, screen, colorMap, heightMap, float64(rayAngle), float64(rayDistance), float64(scaleHeight), data)
+		rayAngle += deltaAngle
 	}
 
 	for i := 0; i < int(screen.width); i++ {

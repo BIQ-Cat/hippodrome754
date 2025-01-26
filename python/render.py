@@ -2,7 +2,6 @@ import ctypes
 import io
 import os
 import pathlib
-import typing
 
 import numpy
 import pygame as pg
@@ -47,14 +46,14 @@ class Render:
         height_map = io.BytesIO()
         numpy.savetxt(height_map,
                       self.state.height_map,
-                      fmt="%x",
+                      fmt="%06x",
                       delimiter=",",
                       newline="\n")
 
         color_map = io.BytesIO()
         numpy.savetxt(color_map,
                       self.state.color_map,
-                      fmt="%x",
+                      fmt="%06x",
                       delimiter=",",
                       newline="\n")
 
