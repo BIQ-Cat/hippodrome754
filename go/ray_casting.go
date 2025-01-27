@@ -30,6 +30,17 @@ import (
 	"unsafe"
 )
 
+type Camera struct {
+	x, y   float64
+	angle  float64
+	height float64
+	pitch  float64
+}
+
+type Screen struct {
+	width, height int
+}
+
 type result struct {
 	index int
 	value []C.int
@@ -54,6 +65,7 @@ func castRay(
 	drawing := make([]C.int, screen.height)
 	sin, cos := math.Sincos(float64(rayAngle))
 	smallestY := int(screen.height)
+	firstLine := true
 
 	for z := 1.0; z < rayDistance; z++ {
 		x := int(z*cos + float64(camera.x))
@@ -72,6 +84,53 @@ func castRay(
 		heightOnMap := must(hex.DecodeString(heightMap[x][y][:4]))
 		heightOnScreen := int(float64(camera.height-C.double(heightOnMap[0]))/depth*scaleHeight + float64(camera.pitch))
 
+		if firstLine {
+			smallestY = min(smallestY, heightOnScreen)
+			firstLine = false
+		}
+
+		if heightOnScreen < 0 {
+			heightOnScreen = 0
+		}
+
+		if heightOnScreen < smallestY {
+			for screenY := heightOnScreen; screenY < smallestY; screenY++ {
+				drawing[screenY] = C.int(must(strconv.ParseInt(colorMap[x][y], 16, 32)))
+			}
+			smallestY = heightOnScreen
+		}
+	}
+	res <- result{index, drawing}
+}
+
+func castRayNoCGo(
+	index int,
+	camera Camera, screen Screen,
+	colorMap [][]string, heightMap [][]string,
+	rayAngle float64, rayDistance float64, scaleHeight float64,
+	res chan<- result,
+) {
+	drawing := make([]C.int, screen.height)
+	sin, cos := math.Sincos(float64(rayAngle))
+	smallestY := int(screen.height)
+
+	for z := 1.0; z < rayDistance; z++ {
+		x := int(z*cos + float64(camera.x))
+		if x < 0 || x >= len(heightMap) {
+			continue
+		}
+
+		y := int(z*sin + float64(camera.y))
+		if y < 0 || y >= len(heightMap[0]) {
+			continue
+		}
+
+		// magic formula to remove fish eye
+		depth := z * math.Cos(float64(camera.angle)-rayAngle)
+
+		heightOnMap := must(hex.DecodeString(heightMap[x][y][:4]))
+		heightOnScreen := int(float64(camera.height-float64(heightOnMap[0]))/depth*scaleHeight + float64(camera.pitch))
+
 		if heightOnScreen < 0 {
 			heightOnScreen = 0
 		}
@@ -88,6 +147,7 @@ func castRay(
 
 //export RayCasting
 func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, maps C.Maps, fov C.double) **C.int {
+	pinner.Unpin()
 	res := make([]*C.int, screen.width)
 	data := make(chan result, screen.width)
 
