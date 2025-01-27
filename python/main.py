@@ -24,17 +24,17 @@ if __name__ == '__main__':
         pressed_key = pg.key.get_pressed()
         if pressed_key[pg.K_j]:
             state.camera["pitch"] += vel
-        if pressed_key[pg.K_DOWN]:
+        if pressed_key[pg.K_k]:
             state.camera["pitch"] -= vel
 
-        if pressed_key[pg.K_k]:
+        if pressed_key[pg.K_h]:
             state.camera["angle"] -= angle_vel
-        if pressed_key[pg.K_RIGHT]:
+        if pressed_key[pg.K_l]:
             state.camera["angle"] += angle_vel
 
-        if pressed_key[pg.K_h]:
+        if pressed_key[pg.K_LEFTBRACKET]:
             state.camera["height"] += vel
-        if pressed_key[pg.K_l]:
+        if pressed_key[pg.K_RIGHTBRACKET]:
             state.camera["height"] -= vel
 
         if pressed_key[pg.K_w]:
