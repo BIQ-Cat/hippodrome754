@@ -175,3 +175,7 @@ cython_debug/
 
 # Cgo headers
 *.h
+
+# Windows stuff
+desktop.ini
+ray_casting.dll
