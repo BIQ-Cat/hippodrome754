@@ -3,25 +3,30 @@ import pygame as pg
 from state import State
 from render import Render
 from camera import Camera
+from map import Map
 
 if __name__ == '__main__':
     pg.init()
 
-    state = State(Camera())
-    
-    screen = pg.display.set_mode((state.SCREEN_WIDTH, state.SCREEN_HEIGHT), pg.SCALED)
+    screen = pg.display.set_mode((500, 500), pg.SCALED)
     clock = pg.time.Clock()
 
-    render = Render(screen, state)
+    state = State(Camera())
+    # render = Render(screen, state)
+
+    map = Map()
 
     running = True
     while running:
+        state.camera.update()
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 running = False
 
-        state.camera.update()
-        render.draw()
+        # render.draw()
+                
+        pg.surfarray.blit_array(screen, map.get_height_map())
 
         clock.tick(state.FPS)
         pg.display.flip()
