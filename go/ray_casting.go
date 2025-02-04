@@ -52,7 +52,7 @@ func must[T any](value T, err error) T {
 func castRay(
 	index int,
 	camera C.Camera, screen C.Screen,
-	colorMap []C.int, heightMap []C.int,
+	colorMap []int, heightMap []int,
 	mapWidth, mapHeight int,
 	rayAngle float64, rayDistance float64, scaleHeight float64,
 	res chan<- result,
@@ -141,7 +141,7 @@ func castRayNoCGo(
 }
 
 //export RayCasting
-func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, colorMap *C.int, heightMap *C.int, mapWidth C.int, mapHeight C.int, fov C.double) **C.int {
+func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, colorMap *int, heightMap *int, mapWidth C.int, mapHeight C.int, fov C.double) **C.int {
 	pinner.Unpin()
 	res := make([]*C.int, screen.width)
 	data := make(chan result, screen.width)
