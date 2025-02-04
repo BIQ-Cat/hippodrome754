@@ -14,15 +14,9 @@ typedef struct {
 	int height;
 } Screen;
 
-typedef struct {
-	char* colorMap;
-	char* heightMap;
-} Maps;
 */
 import "C"
 import (
-	"bytes"
-	"encoding/csv"
 	"encoding/hex"
 	"math"
 	"runtime"
@@ -58,7 +52,8 @@ func must[T any](value T, err error) T {
 func castRay(
 	index int,
 	camera C.Camera, screen C.Screen,
-	colorMap [][]string, heightMap [][]string,
+	colorMap []C.int, heightMap []C.int,
+	mapWidth, mapHeight int,
 	rayAngle float64, rayDistance float64, scaleHeight float64,
 	res chan<- result,
 ) {
@@ -69,20 +64,20 @@ func castRay(
 
 	for z := 1.0; z < rayDistance; z++ {
 		x := int(z*cos + float64(camera.x))
-		if x < 0 || x >= len(heightMap) {
+		if x < 0 || x >= mapWidth {
 			continue
 		}
 
 		y := int(z*sin + float64(camera.y))
-		if y < 0 || y >= len(heightMap[0]) {
+		if y < 0 || y >= mapHeight {
 			continue
 		}
 
 		// magic formula to remove fish eye
 		depth := z * math.Cos(float64(camera.angle)-rayAngle)
 
-		heightOnMap := must(hex.DecodeString(heightMap[x][y][:4]))
-		heightOnScreen := int(float64(camera.height-C.double(heightOnMap[0]))/depth*scaleHeight + float64(camera.pitch))
+		heightOnMap := heightMap[x*mapHeight+y] & 0xFF
+		heightOnScreen := int(float64(camera.height-C.double(heightOnMap))/depth*scaleHeight + float64(camera.pitch))
 
 		if firstLine {
 			smallestY = min(smallestY, heightOnScreen)
@@ -95,7 +90,7 @@ func castRay(
 
 		if heightOnScreen < smallestY {
 			for screenY := heightOnScreen; screenY < smallestY; screenY++ {
-				drawing[screenY] = C.int(must(strconv.ParseInt(colorMap[x][y], 16, 32)))
+				drawing[screenY] = C.int(colorMap[x*mapHeight+y])
 			}
 			smallestY = heightOnScreen
 		}
@@ -146,18 +141,18 @@ func castRayNoCGo(
 }
 
 //export RayCasting
-func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, maps C.Maps, fov C.double) **C.int {
+func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, colorMap *C.int, heightMap *C.int, mapWidth C.int, mapHeight C.int, fov C.double) **C.int {
 	pinner.Unpin()
 	res := make([]*C.int, screen.width)
 	data := make(chan result, screen.width)
 
 	rayAngle := camera.angle - (fov / 2)
 
-	colorMap := must(csv.NewReader(bytes.NewBufferString(C.GoString(maps.colorMap))).ReadAll())
-	heightMap := must(csv.NewReader(bytes.NewBufferString(C.GoString(maps.heightMap))).ReadAll())
+	goColorMap := unsafe.Slice(colorMap, mapWidth*mapHeight)
+	goHeightMap := unsafe.Slice(heightMap, mapWidth*mapHeight)
 
 	for i := 0; i < int(screen.width); i++ {
-		go castRay(i, camera, screen, colorMap, heightMap, float64(rayAngle), float64(rayDistance), float64(scaleHeight), data)
+		go castRay(i, camera, screen, goColorMap, goHeightMap, int(mapWidth), int(mapHeight), float64(rayAngle), float64(rayDistance), float64(scaleHeight), data)
 		rayAngle += deltaAngle
 	}
 

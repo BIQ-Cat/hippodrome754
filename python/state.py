@@ -5,17 +5,18 @@ import pygame as pg
 
 from camera import Camera
 
+
 class State:
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 450
-    
+
     FPS = 60
 
     FOV = math.pi / 6
     RAY_CASTING_DELTA_ANGLE = FOV / SCREEN_WIDTH
     RAY_CASTING_RAY_DISTANCE = 2000
     SCALE_HEIGHT = 980
-    
+
     MAP_DIR = pathlib.Path(__file__).parent.parent.resolve() / 'img'
 
     def __init__(self, camera: Camera):
