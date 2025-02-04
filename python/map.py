@@ -12,13 +12,10 @@ class Map:
         return self.height_map
 
     def __generate_height(self, height):
-        hexx = hex(randint(height, height + 5))[2:] * 3
+        if height <= 0:
+            return np.int32(4095)
 
-        try:
-            return np.int32(int(hexx, 16))
-        
-        except:
-            print(hexx)
+        return np.int32(int(hex(randint(height, height + 5))[2:] * 3, 16))
 
     def __generate_height_map(self, min_peaks, max_peaks):
         surface = pg.Surface((500, 500))

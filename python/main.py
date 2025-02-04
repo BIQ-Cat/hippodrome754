@@ -7,10 +7,11 @@ from camera import Camera
 if __name__ == '__main__':
     pg.init()
 
-    screen = pg.display.set_mode((800, 450), pg.SCALED)
+    state = State(Camera())
+    
+    screen = pg.display.set_mode((state.SCREEN_WIDTH, state.SCREEN_HEIGHT), pg.SCALED)
     clock = pg.time.Clock()
 
-    state = State(Camera())
     render = Render(screen, state)
 
     running = True
