@@ -38,7 +38,6 @@ dll.RayCasting.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_int))
 
 
 class Render:
-
     def __init__(self, screen: pg.Surface, state: State):
         self.screen = screen
         self.state = state

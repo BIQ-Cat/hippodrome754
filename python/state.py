@@ -23,9 +23,9 @@ class State:
 
         self.color_map_path = self.MAP_DIR / 'color_map.jpg'
         self.height_map_path = self.MAP_DIR / 'height_map.jpg'
-        self.load_maps()
+        self.__load_maps()
 
-    def load_maps(self):
+    def __load_maps(self):
         self.color_map_img = pg.image.load(self.color_map_path)
         self.color_map = pg.surfarray.array2d(self.color_map_img)
 
