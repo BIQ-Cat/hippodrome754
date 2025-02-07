@@ -43,12 +43,27 @@ dll.RayCasting.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_int))
 
 class Render:
 
-    def __init__(self, screen: pg.Surface, state: State, map: Map):
+    def __init__(self,
+                 screen: pg.Surface,
+                 state: State,
+                 map: Map,
+                 resolution=tuple((500, 500))):
         self.screen = screen
         self.state = state
-        self.map = map
+        self.height_map = map.get_height_map().flat.copy()
+        self.color_map = map.get_height_map().flat.copy()
+        self.resolution = resolution
 
-    def __cast(self):
+    def set_color_map(self, color_map: numpy.ndarray):
+        self.color_map = color_map.flat.copy()
+
+    def set_height_map(self, height_map: numpy.ndarray):
+        self.height_map = height_map.flat.copy()
+
+    def set_resolution(self, resolution: tuple[int, int]):
+        self.resolution = resolution
+
+    def rayCasting(self):
         c_screen = dll.RayCasting(
             Camera(self.state.camera.get_x(), self.state.camera.get_y(),
                    self.state.camera.get_angle(),
@@ -56,9 +71,9 @@ class Render:
                    self.state.camera.get_pitch()),
             Screen(self.state.SCREEN_WIDTH, self.state.SCREEN_HEIGHT),
             self.state.RAY_CASTING_DELTA_ANGLE, self.state.SCALE_HEIGHT,
-            self.state.RAY_CASTING_RAY_DISTANCE,
-            self.map.get_height_map().flat.copy(),
-            self.map.get_height_map().flat.copy(), 500, 500, self.state.FOV)
+            self.state.RAY_CASTING_RAY_DISTANCE, self.color_map,
+            self.height_map, self.resolution[0], self.resolution[1],
+            self.state.FOV)
 
         screen = [[
             int(c_screen[i][j]) for j in range(self.state.SCREEN_HEIGHT)
@@ -69,5 +84,5 @@ class Render:
         return screen_array
 
     def draw(self):
-        screen_array = self.__cast()
+        screen_array = self.rayCasting()
         pg.surfarray.blit_array(self.screen, screen_array)
