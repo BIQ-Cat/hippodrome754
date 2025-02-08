@@ -59,6 +59,10 @@ class Render:
 
     def set_height_map(self, height_map: numpy.ndarray):
         self.height_map = height_map.flat.copy()
+    
+    def set_maps(self, maps: tuple[numpy.ndarray, numpy.ndarray]):
+        self.color_map = maps[0].flat.copy()
+        self.height_map = maps[1].flat.copy()
 
     def set_resolution(self, resolution: tuple[int, int]):
         self.resolution = resolution
@@ -79,7 +83,7 @@ class Render:
             int(c_screen[i][j]) for j in range(self.state.SCREEN_HEIGHT)
         ] for i in range(self.state.SCREEN_WIDTH)]
 
-        screen_array = numpy.array(screen, dtype=int)
+        screen_array = numpy.array(screen, dtype=numpy.int64)
 
         return screen_array
 
