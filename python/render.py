@@ -7,6 +7,9 @@ import numpy
 import pygame as pg
 
 from map import Map
+from entity import Entity
+from core import Core
+from frame import Frame
 from state import State
 
 
@@ -34,8 +37,8 @@ else:
 
 dll.RayCasting.argtypes = [
     Camera, Screen, ctypes.c_double, ctypes.c_int, ctypes.c_int,
-    numpy.ctypeslib.ndpointer(numpy.int64),
-    numpy.ctypeslib.ndpointer(numpy.int64), ctypes.c_int, ctypes.c_int,
+    numpy.ctypeslib.ndpointer(numpy.int32),
+    numpy.ctypeslib.ndpointer(numpy.int32), ctypes.c_int, ctypes.c_int,
     ctypes.c_double
 ]
 dll.RayCasting.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_int))
@@ -47,27 +50,24 @@ class Render:
                  screen: pg.Surface,
                  state: State,
                  map: Map,
-                 resolution=tuple((500, 500))):
+                 resolution=tuple((500, 500)), *enitities: Entity):
         self.screen = screen
         self.state = state
-        self.height_map = map.get_height_map().flat.copy()
-        self.color_map = map.get_height_map().flat.copy()
+        self.height_map = map.get_height_map().copy()
+        self.color_map = map.get_height_map().copy()
         self.resolution = resolution
+        self.entity_list = [Frame(127, 127, state)] + list(enitities)
 
     def set_color_map(self, color_map: numpy.ndarray):
-        self.color_map = color_map.flat.copy()
+        self.color_map = color_map.copy()
 
     def set_height_map(self, height_map: numpy.ndarray):
-        self.height_map = height_map.flat.copy()
-    
-    def set_maps(self, maps: tuple[numpy.ndarray, numpy.ndarray]):
-        self.color_map = maps[0].flat.copy()
-        self.height_map = maps[1].flat.copy()
+        self.height_map = height_map.copy()
 
     def set_resolution(self, resolution: tuple[int, int]):
         self.resolution = resolution
 
-    def rayCasting(self):
+    def rayCasting(self, color_map: numpy.ndarray, height_map: numpy.ndarray):
         c_screen = dll.RayCasting(
             Camera(self.state.camera.get_x(), self.state.camera.get_y(),
                    self.state.camera.get_angle(),
@@ -75,18 +75,37 @@ class Render:
                    self.state.camera.get_pitch()),
             Screen(self.state.SCREEN_WIDTH, self.state.SCREEN_HEIGHT),
             self.state.RAY_CASTING_DELTA_ANGLE, self.state.SCALE_HEIGHT,
-            self.state.RAY_CASTING_RAY_DISTANCE, self.color_map,
-            self.height_map, self.resolution[0], self.resolution[1],
+            self.state.RAY_CASTING_RAY_DISTANCE, color_map,
+            height_map, self.resolution[0], self.resolution[1],
             self.state.FOV)
 
         screen = [[
             int(c_screen[i][j]) for j in range(self.state.SCREEN_HEIGHT)
         ] for i in range(self.state.SCREEN_WIDTH)]
 
-        screen_array = numpy.array(screen, dtype=numpy.int64)
+        screen_array = numpy.array(screen, dtype=numpy.int32)
 
         return screen_array
 
-    def draw(self):
-        screen_array = self.rayCasting()
+    def render(self):
+        color_map = self.color_map.copy()
+        height_map = self.height_map.copy()
+        
+        has_prebuild_core = False
+        for entity in self.entity_list:
+            self.height_map = entity.terraforming(self.height_map)
+            color_map, height_map = entity.pre_render(color_map, height_map)
+            
+            if isinstance(entity, Core) and entity.prebuild_state:
+                has_prebuild_core = True
+        
+        key = pg.key.get_pressed()
+        if key[pg.K_SPACE] and not has_prebuild_core:
+            self.entity_list.append(Core(130, 130, self.state.camera))
+        
+        
+        for entity in self.entity_list:
+            color_map, height_map = entity.render(color_map, height_map)
+        
+        screen_array = self.rayCasting(color_map.flat.copy(), height_map.flat.copy())
         pg.surfarray.blit_array(self.screen, screen_array)

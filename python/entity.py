@@ -1,8 +1,6 @@
 import abc
 import numpy
 
-from map import Map
-
 
 class Entity(abc.ABC):
 
@@ -30,6 +28,12 @@ class Entity(abc.ABC):
 
     def get_height(self):
         return self.pos_y + self.resolution[1]
+    
+    def pre_render(self, color_map: numpy.ndarray, height_map: numpy.ndarray):
+        return (color_map, height_map)
+    
+    def terraforming(self, height_map: numpy.ndarray):
+        return height_map
 
     def render(self, color_map: numpy.ndarray, height_map: numpy.ndarray):
         res_color = color_map
@@ -42,27 +46,8 @@ class Entity(abc.ABC):
             for y in range(self.resolution[1]):
                 map_pos = (x + self.pos_x, y + self.pos_y)
                 res_color[map_pos] = entitiy_color[x, y]
-                res_height[map_pos] = entity_height[x, y] + 127
+                res_height[map_pos] = entity_height[x, y] + 8553090
 
         return (res_color, res_height)
 
-
-class EntityList(list[Entity]):
-    def __init__(self, map: Map, *enitites: Entity):
-        super().__init__(enitites)
-        self.color_map = map.get_height_map()
-        self.height_map = map.get_height_map()
-
-    def set_color_map(self, color_map: numpy.ndarray):
-        self.color_map = color_map
-
-    def set_height_map(self, height_map: numpy.ndarray):
-        self.height_map = height_map
-
-    def generate_map(self):
-        color_map = self.color_map
-        height_map = self.height_map
-        for entity in self:
-            color_map, height_map = entity.render(color_map, height_map)
-
-        return (color_map, height_map)
+        

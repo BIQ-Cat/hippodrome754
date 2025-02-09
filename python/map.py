@@ -19,10 +19,10 @@ class Map:
         elif height > 250:
             height = 250
 
-        return np.int64(int(hex(randint(height, height + 5))[2:] * 3, 16))
+        return np.int32(int(hex(randint(height, height + 5))[2:] * 3, 16))
 
     def __generate_height_map(self, min_peaks, max_peaks):
-        height_map = np.ndarray((500, 500), dtype=np.int64)
+        height_map = np.ndarray((500, 500), dtype=np.int32)
         height_map.fill(0)
 
         index_pairs = [(randint(0, 499), randint(0, 499))

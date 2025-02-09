@@ -37,7 +37,7 @@ type Screen struct {
 
 type result struct {
 	index int
-	value []C.int
+	value []int32
 }
 
 var pinner runtime.Pinner
@@ -52,12 +52,12 @@ func must[T any](value T, err error) T {
 func castRay(
 	index int,
 	camera C.Camera, screen C.Screen,
-	colorMap []int, heightMap []int,
+	colorMap []int32, heightMap []int32,
 	mapWidth, mapHeight int,
 	rayAngle float64, rayDistance float64, scaleHeight float64,
 	res chan<- result,
 ) {
-	drawing := make([]C.int, screen.height)
+	drawing := make([]int32, screen.height)
 	sin, cos := math.Sincos(float64(rayAngle))
 	smallestY := int(screen.height)
 	firstLine := true
@@ -90,7 +90,7 @@ func castRay(
 
 		if heightOnScreen < smallestY {
 			for screenY := heightOnScreen; screenY < smallestY; screenY++ {
-				drawing[screenY] = C.int(colorMap[x*mapHeight+y])
+				drawing[screenY] = colorMap[x*mapHeight+y]
 			}
 			smallestY = heightOnScreen
 		}
@@ -105,7 +105,7 @@ func castRayNoCGo(
 	rayAngle float64, rayDistance float64, scaleHeight float64,
 	res chan<- result,
 ) {
-	drawing := make([]C.int, screen.height)
+	drawing := make([]int32, screen.height)
 	sin, cos := math.Sincos(float64(rayAngle))
 	smallestY := int(screen.height)
 
@@ -132,7 +132,7 @@ func castRayNoCGo(
 
 		if heightOnScreen < smallestY {
 			for screenY := heightOnScreen; screenY < smallestY; screenY++ {
-				drawing[screenY] = C.int(must(strconv.ParseInt(colorMap[x][y], 16, 32)))
+				drawing[screenY] = int32(must(strconv.ParseInt(colorMap[x][y], 16, 32)))
 			}
 			smallestY = heightOnScreen
 		}
@@ -141,9 +141,9 @@ func castRayNoCGo(
 }
 
 //export RayCasting
-func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, colorMap *int, heightMap *int, mapWidth C.int, mapHeight C.int, fov C.double) **C.int {
+func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeight C.int, rayDistance C.int, colorMap *int32, heightMap *int32, mapWidth C.int, mapHeight C.int, fov C.double) **int32 {
 	pinner.Unpin()
-	res := make([]*C.int, screen.width)
+	res := make([]*int32, screen.width)
 	data := make(chan result, screen.width)
 
 	rayAngle := camera.angle - (fov / 2)
@@ -159,11 +159,11 @@ func RayCasting(camera C.Camera, screen C.Screen, deltaAngle C.double, scaleHeig
 	for i := 0; i < int(screen.width); i++ {
 		line := <-data
 		pinner.Pin(&line.value[0])
-		res[line.index] = (*C.int)(unsafe.Pointer(&line.value[0]))
+		res[line.index] = (*int32)(unsafe.Pointer(&line.value[0]))
 	}
 
 	pinner.Pin(&res[0])
-	return (**C.int)(unsafe.Pointer(&res[0]))
+	return (**int32)(unsafe.Pointer(&res[0]))
 }
 
 func main() {}
