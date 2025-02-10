@@ -1,13 +1,15 @@
 import abc
 import numpy
 
+from state import State
+
 
 class Entity(abc.ABC):
-
-    def __init__(self, x: int, y: int, resolution: tuple[int, int]):
+    def __init__(self, x: int, y: int, resolution: tuple[int, int], state: State):
         self.pos_x = x
         self.pos_y = y
         self.resolution = resolution
+        self.state = state
 
     @abc.abstractmethod
     def get_color_map(self) -> numpy.ndarray:
@@ -29,10 +31,25 @@ class Entity(abc.ABC):
     def get_height(self):
         return self.pos_y + self.resolution[1]
     
-    def pre_render(self, color_map: numpy.ndarray, height_map: numpy.ndarray):
-        return (color_map, height_map)
+    def get_terraforming_size(self) -> int:
+        return self.state.DISABLE_TERRAFORMING
     
     def terraforming(self, height_map: numpy.ndarray):
+        if self.get_terraforming_size() == self.state.DISABLE_TERRAFORMING:
+            return height_map
+
+        terraforming_size = self.get_terraforming_size()
+        
+        max_x = min(self.state.MAP_RESOLUTION[0], self.pos_x + terraforming_size + 1)
+        max_y = min(self.state.MAP_RESOLUTION[1], self.pos_y + terraforming_size + 1)
+
+        for x in range(max(0, self.pos_x - terraforming_size), max_x):
+            for y in range(max(0, self.pos_y - terraforming_size), max_y):
+                if height_map[x, y] & self.state.GET_HEIGHT > self.state.ZERO_LAYER_HEIGHT:
+                    height_map[x, y] = height_map[x, y] - 1
+                elif height_map[x, y] & self.state.GET_HEIGHT < self.state.ZERO_LAYER_HEIGHT:
+                    height_map[x, y] = height_map[x, y] + 1
+        
         return height_map
 
     def render(self, color_map: numpy.ndarray, height_map: numpy.ndarray):
@@ -46,7 +63,7 @@ class Entity(abc.ABC):
             for y in range(self.resolution[1]):
                 map_pos = (x + self.pos_x, y + self.pos_y)
                 res_color[map_pos] = entitiy_color[x, y]
-                res_height[map_pos] = entity_height[x, y] + 8553090
+                res_height[map_pos] = entity_height[x, y] + self.state.ZERO_LAYER_COLOR
 
         return (res_color, res_height)
 

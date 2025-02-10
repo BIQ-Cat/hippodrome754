@@ -44,8 +44,7 @@ dll.RayCasting.argtypes = [
 dll.RayCasting.restype = ctypes.POINTER(ctypes.POINTER(ctypes.c_int))
 
 
-class Render:
-
+class Landscape:
     def __init__(self,
                  screen: pg.Surface,
                  state: State,
@@ -86,23 +85,21 @@ class Render:
         screen_array = numpy.array(screen, dtype=numpy.int32)
 
         return screen_array
+    
+    def terraforming(self):
+        for entity in self.entity_list:
+            self.height_map = entity.terraforming(self.height_map)
+    
+    def update(self):
+        key = pg.key.get_pressed()
+        if key[pg.K_SPACE] and not self.state.has_prebulid_core:
+            self.entity_list.append(Core(130, 130, self.state))
+            self.state.has_prebulid_core = True
+
 
     def render(self):
         color_map = self.color_map.copy()
         height_map = self.height_map.copy()
-        
-        has_prebuild_core = False
-        for entity in self.entity_list:
-            self.height_map = entity.terraforming(self.height_map)
-            color_map, height_map = entity.pre_render(color_map, height_map)
-            
-            if isinstance(entity, Core) and entity.prebuild_state:
-                has_prebuild_core = True
-        
-        key = pg.key.get_pressed()
-        if key[pg.K_SPACE] and not has_prebuild_core:
-            self.entity_list.append(Core(130, 130, self.state.camera))
-        
         
         for entity in self.entity_list:
             color_map, height_map = entity.render(color_map, height_map)

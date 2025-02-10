@@ -3,10 +3,8 @@ import numpy
 import pygame as pg
 
 from map import Map
-from frame import Frame
-from core import Core
 from state import State
-from render import Render
+from landscape import Landscape
 from camera import Camera
 
 if __name__ == '__main__':
@@ -18,7 +16,7 @@ if __name__ == '__main__':
     screen = pg.display.set_mode((state.SCREEN_WIDTH, state.SCREEN_HEIGHT), pg.SCALED)
     clock = pg.time.Clock()
 
-    render = Render(screen, state, maps)
+    landscape = Landscape(screen, state, maps)
     
     running = True
     while running:
@@ -27,7 +25,10 @@ if __name__ == '__main__':
                 running = False
 
         state.camera.update()
-        render.render()
+
+        landscape.terraforming()
+        landscape.update()
+        landscape.render()
 
         clock.tick(state.FPS)
         pg.display.flip()
