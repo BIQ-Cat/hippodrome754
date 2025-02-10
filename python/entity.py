@@ -40,8 +40,8 @@ class Entity(abc.ABC):
 
         terraforming_size = self.get_terraforming_size()
         
-        max_x = min(self.state.MAP_RESOLUTION[0], self.pos_x + terraforming_size + 1)
-        max_y = min(self.state.MAP_RESOLUTION[1], self.pos_y + terraforming_size + 1)
+        max_x = min(self.state.MAP_RESOLUTION[0], self.get_width() + terraforming_size + 1)
+        max_y = min(self.state.MAP_RESOLUTION[1], self.get_height() + terraforming_size + 1)
 
         for x in range(max(0, self.pos_x - terraforming_size), max_x):
             for y in range(max(0, self.pos_y - terraforming_size), max_y):
