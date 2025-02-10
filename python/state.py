@@ -29,3 +29,4 @@ class State:
         self.camera = camera
 
         self.has_prebulid_core = False
+        self.new_core_built = False

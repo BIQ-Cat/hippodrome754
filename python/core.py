@@ -6,7 +6,7 @@ from state import State
 
 
 class Core(Entity):
-    COOLDOWN = 3000
+    COOLDOWN = 2000
     def __init__(self, x: int, y: int, state: State):
         super().__init__(x, y, (16, 16), state)
         self.height_map = numpy.ndarray(self.resolution, dtype=numpy.int32)
@@ -33,7 +33,7 @@ class Core(Entity):
     
     def __load_height_map(self):
         self.height_map.fill(10)
-        self.height_map[4:10, 4:10].fill(27)
+        self.height_map[4:12, 4:12].fill(27)
 
     
     def get_color_map(self) -> numpy.ndarray:        
@@ -94,6 +94,7 @@ class Core(Entity):
             if key[pygame.K_RETURN] and self.can_be_built:
                 self.prebuild_state = False
                 self.state.has_prebulid_core = False
+                self.state.new_core_built = True
 
     
     def render(self, color_map: numpy.ndarray, height_map: numpy.ndarray):

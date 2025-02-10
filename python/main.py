@@ -3,6 +3,7 @@ import numpy
 import pygame as pg
 
 from map import Map
+from portal import Portal
 from state import State
 from landscape import Landscape
 from camera import Camera
@@ -15,8 +16,10 @@ if __name__ == '__main__':
 
     screen = pg.display.set_mode((state.SCREEN_WIDTH, state.SCREEN_HEIGHT), pg.SCALED)
     clock = pg.time.Clock()
+    
+    portal = Portal(400, 400, state)
 
-    landscape = Landscape(screen, state, maps)
+    landscape = Landscape(screen, state, maps, state.MAP_RESOLUTION, portal)
     
     running = True
     while running:
@@ -29,6 +32,10 @@ if __name__ == '__main__':
         landscape.terraforming()
         landscape.update()
         landscape.render()
+        
+        if landscape.check_win(portal):
+            print("Win")
+            break
 
         clock.tick(state.FPS)
         pg.display.flip()

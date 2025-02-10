@@ -10,6 +10,7 @@ from map import Map
 from entity import Entity
 from core import Core
 from frame import Frame
+from portal import Portal
 from state import State
 
 
@@ -89,6 +90,16 @@ class Landscape:
     def terraforming(self):
         for entity in self.entity_list:
             self.height_map = entity.terraforming(self.height_map)
+    
+    def check_win(self, portal: Portal):
+        if not self.state.new_core_built:
+            return False
+        
+        self.state.new_core_built = False
+        last_core = self.entity_list[-1]
+        
+        return portal.pos_x - 5 <= last_core.pos_x <= portal.get_width() + 5 and \
+               portal.pos_y - 5 <= last_core.pos_y <= portal.get_height() + 5
     
     def update(self):
         key = pg.key.get_pressed()
