@@ -1,5 +1,7 @@
 import numpy
 import pygame
+from PIL import Image
+
 from entity import Entity
 from camera import Camera
 from state import State
@@ -9,9 +11,10 @@ class Core(Entity):
     COOLDOWN = 2000
     def __init__(self, x: int, y: int, state: State):
         super().__init__(x, y, (16, 16), state)
-        self.height_map = numpy.ndarray(self.resolution, dtype=numpy.int32)
+        # self.height_map = numpy.ndarray(self.resolution, dtype=numpy.int32)
+        self.height_map = self.__load_map(False)
         self.color_maps = {
-            "built": numpy.ndarray(self.resolution, dtype=numpy.int32),
+            "built": self.__load_map(True),
             "can": numpy.ndarray(self.resolution, dtype=numpy.int32),
             "cannot": numpy.ndarray(self.resolution, dtype=numpy.int32)
         }
@@ -24,10 +27,10 @@ class Core(Entity):
         self.last = pygame.time.get_ticks()
 
         self.__load_color_maps()
-        self.__load_height_map()
+        # self.__load_height_map()
     
     def __load_color_maps(self):
-        self.color_maps["built"].fill(0x0000ff)
+        # self.color_maps["built"].fill(0x0000ff)
         self.color_maps["can"].fill(0x00ff00)
         self.color_maps["cannot"].fill(0xff0000)
     
@@ -35,6 +38,23 @@ class Core(Entity):
         self.height_map.fill(10)
         self.height_map[4:12, 4:12].fill(27)
 
+    def __load_map(self, is_color_map):
+        array = numpy.ndarray(self.resolution, dtype=numpy.int32)
+
+        if is_color_map:
+            img = Image.open(str(self.state.MAP_DIR / "core_color_map.jpg"))
+
+        else:
+            img = Image.open(str(self.state.MAP_DIR / "core_height_map.jpg"))
+        
+        pixels = img.load()
+        for y in range(self.resolution[1]):
+            for x in range(self.resolution[0]):
+                r, g, b = pixels[x, y]  # type: ignore
+                
+                array[x, y] = r * 65536 + g * 256 + b
+
+        return array
     
     def get_color_map(self) -> numpy.ndarray:        
         if not self.prebuild_state:

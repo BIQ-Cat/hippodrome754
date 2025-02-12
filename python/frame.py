@@ -1,5 +1,6 @@
 import numpy
 import pygame
+from PIL import Image
 
 from entity import Entity
 from state import State
@@ -7,22 +8,34 @@ from state import State
 
 class Frame(Entity):
     COOLDOWN = 1000
-    RESOLUTION = (27, 27)
+    RESOLUTION = (25, 25)
     def __init__(self, x: int, y: int, state: State):
         super().__init__(x, y, self.RESOLUTION, state)
-        self.color_map = numpy.ndarray(self.resolution, dtype=numpy.int32)
-        self.height_map = numpy.ndarray(self.resolution, dtype=numpy.int32)
+        self.color_map = self.__load_map(True)
+        self.height_map = self.__load_map(False)
+        
         self.last = pygame.time.get_ticks()
 
-        self.__load_color_map()
-        self.__load_height_map()
-    
-    def __load_color_map(self):
-        self.color_map.fill(0xfadb78)
-    
+    def __load_map(self, is_color_map):
+        array = numpy.ndarray(self.resolution, dtype=numpy.int32)
+
+        if is_color_map:
+            img = Image.open(str(self.state.MAP_DIR / "frame_color_map.jpg"))
+
+        else:
+            img = Image.open(str(self.state.MAP_DIR / "frame_height_map.jpg"))
+        
+        pixels = img.load()
+        for y in range(self.resolution[1]):
+            for x in range(self.resolution[0]):
+                r, g, b = pixels[x, y]  # type: ignore
+                
+                array[x, y] = r * 65536 + g * 256 + b
+
+        return array
+
     def __load_height_map(self):
-        self.height_map.fill(27)
-    
+        pass
     
     def get_color_map(self) -> numpy.ndarray:
         return self.color_map
