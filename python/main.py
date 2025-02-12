@@ -17,7 +17,7 @@ if __name__ == '__main__':
     screen = pg.display.set_mode((state.SCREEN_WIDTH, state.SCREEN_HEIGHT), pg.SCALED)
     clock = pg.time.Clock()
     
-    portal = Portal(400, 400, state)
+    portal = Portal(250, 200, state)
 
     landscape = Landscape(screen, state, maps, state.MAP_RESOLUTION, portal)
     

@@ -25,10 +25,10 @@ class Entity(abc.ABC):
     def update_y(self, y: int):
         self.pos_y = y
 
-    def get_width(self):
+    def get_left(self):
         return self.pos_x + self.resolution[0]
 
-    def get_height(self):
+    def get_top(self):
         return self.pos_y + self.resolution[1]
     
     def get_terraforming_size(self) -> int:
@@ -40,8 +40,8 @@ class Entity(abc.ABC):
 
         terraforming_size = self.get_terraforming_size()
         
-        max_x = min(self.state.MAP_RESOLUTION[0], self.get_width() + terraforming_size + 1)
-        max_y = min(self.state.MAP_RESOLUTION[1], self.get_height() + terraforming_size + 1)
+        max_x = min(self.state.MAP_RESOLUTION[0], self.get_left() + terraforming_size + 1)
+        max_y = min(self.state.MAP_RESOLUTION[1], self.get_top() + terraforming_size + 1)
 
         for x in range(max(0, self.pos_x - terraforming_size), max_x):
             for y in range(max(0, self.pos_y - terraforming_size), max_y):

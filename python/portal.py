@@ -4,6 +4,7 @@ from state import State
 
 
 class Portal(Entity):
+    WIN_DIFF = 10
     def __init__(self, x: int, y: int, state: State):
         super().__init__(x, y, (30, 20), state)
         self.color_map = numpy.ndarray(self.resolution, dtype=numpy.int32)

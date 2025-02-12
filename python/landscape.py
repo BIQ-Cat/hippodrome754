@@ -98,8 +98,22 @@ class Landscape:
         self.state.new_core_built = False
         last_core = self.entity_list[-1]
         
-        return portal.pos_x - 5 <= last_core.pos_x <= portal.get_width() + 5 and \
-               portal.pos_y - 5 <= last_core.pos_y <= portal.get_height() + 5
+        print(last_core.pos_x, last_core.pos_y, last_core.get_left(), last_core.get_top())
+        print(portal.pos_x, portal.pos_y, portal.get_left(), portal.get_top())
+                
+        return (
+                portal.pos_x - portal.WIN_DIFF <= last_core.get_left() <= portal.get_left() + portal.WIN_DIFF and \
+                portal.pos_y - portal.WIN_DIFF <= last_core.get_top() <= portal.get_top() + portal.WIN_DIFF
+               ) or (
+                portal.pos_x - portal.WIN_DIFF <= last_core.pos_x <= portal.get_left() + portal.WIN_DIFF and \
+                portal.pos_y - portal.WIN_DIFF <= last_core.pos_y <= portal.get_top() + portal.WIN_DIFF
+               ) or (
+                portal.pos_x - portal.WIN_DIFF <= last_core.get_left() <= portal.get_left() + portal.WIN_DIFF and \
+                portal.pos_y - portal.WIN_DIFF <= last_core.pos_y <= portal.get_top() + portal.WIN_DIFF
+               ) or (
+                portal.pos_x - portal.WIN_DIFF <= last_core.pos_x <= portal.get_left() + portal.WIN_DIFF and \
+                portal.pos_y - portal.WIN_DIFF <= last_core.get_top() <= portal.get_top() + portal.WIN_DIFF
+               )
     
     def update(self):
         key = pg.key.get_pressed()
