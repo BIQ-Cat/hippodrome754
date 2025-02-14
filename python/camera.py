@@ -4,7 +4,7 @@ import pygame as pg
 
 
 class Camera:
-    def __init__(self, x=0, y=0, 
+    def __init__(self, x=-200, y=-200, 
                        height=270, 
                        angle=math.pi / 4, pitch=20, 
                        vel=3, angle_vel=0.01):

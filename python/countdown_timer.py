@@ -5,9 +5,9 @@ from state import State
 
 class Timer:
     EVENT = pygame.USEREVENT + 1
-    def __init__(self, countdown: int, screen: pygame.Surface, state: State):
-        self.minutes = countdown
-        self.seconds = 0
+    def __init__(self, screen: pygame.Surface, state: State, minutes: int, seconds = 0):
+        self.minutes = minutes
+        self.seconds = seconds
         self.screen = screen
         self.state = state
         self.font = pygame.font.SysFont(None, 100)
@@ -16,7 +16,7 @@ class Timer:
         pygame.time.set_timer(self.EVENT, 1000)
 
     def render_text(self):
-        self.text = self.font.render(f"{self.minutes}:{self.seconds}", True, (128, 0, 0))
+        self.text = self.font.render("{:02d}:{:02d}".format(self.minutes, self.seconds), True, (128, 0, 0))
     
     def update(self):
         if self.seconds == 0:

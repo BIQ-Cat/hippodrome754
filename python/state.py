@@ -31,4 +31,4 @@ class State:
         self.has_prebulid_core = False
         self.new_core_built = False
         
-        self.lost = True
+        self.lost = False

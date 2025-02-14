@@ -56,7 +56,7 @@ class Landscape:
         self.height_map = map.get_height_map().copy()
         self.color_map = map.get_height_map().copy()
         self.resolution = resolution
-        self.entity_list = [Frame(127, 127, state)] + list(enitities)
+        self.entity_list = [Frame(20, 20, state)] + list(enitities)
 
     def set_color_map(self, color_map: numpy.ndarray):
         self.color_map = color_map.copy()
@@ -118,7 +118,7 @@ class Landscape:
     def update(self):
         key = pg.key.get_pressed()
         if key[pg.K_SPACE] and not self.state.has_prebulid_core:
-            self.entity_list.append(Core(130, 130, self.state))
+            self.entity_list.append(Core(self.entity_list[0].pos_x + 10, self.entity_list[0].pos_y + 10, self.state))
             self.state.has_prebulid_core = True
 
 
