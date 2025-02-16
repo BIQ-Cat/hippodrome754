@@ -1,7 +1,6 @@
 import pygame as pg
 
 from state import State
-from render import Render
 from camera import Camera
 from map import Map
 
@@ -12,7 +11,6 @@ if __name__ == '__main__':
     clock = pg.time.Clock()
 
     state = State(Camera())
-    # render = Render(screen, state)
 
     map = Map()
 

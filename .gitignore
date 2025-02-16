@@ -179,3 +179,6 @@ cython_debug/
 # Windows stuff
 desktop.ini
 ray_casting.dll
+
+# Score
+score.txt
