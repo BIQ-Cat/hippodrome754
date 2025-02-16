@@ -24,6 +24,8 @@ class State:
 
     MAP_RESOLUTION = (500, 500)
     MAP_DIR = pathlib.Path(__file__).parent.parent.resolve() / 'img'
+    
+    SOUND_DIR = pathlib.Path(__file__).parent.parent.resolve() / 'sounds'
 
     def __init__(self, camera: Camera):
         self.camera = camera

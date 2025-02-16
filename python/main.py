@@ -83,6 +83,7 @@ if __name__ == '__main__':
         pg.display.set_caption(f"Уровень {level}")
         
         if level == 0:
+            pg.display.set_caption("Обучение")
             help_screen = pg.image.load(State.MAP_DIR / "shambala.png")
             screen.blit(help_screen, help_screen.get_rect(center=screen.get_rect().center))
             pg.display.flip()

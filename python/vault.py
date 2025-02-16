@@ -1,5 +1,7 @@
 import pygame as pg
 
+from state import State
+
 
 class MainDoor(pg.sprite.Sprite):
     def __init__(self, vault_images: tuple, *groups):
@@ -40,7 +42,7 @@ class SecondaryDoor(pg.sprite.Sprite):
     def __init__(self, *groups):
         super().__init__(*groups)
         
-        self.image = pg.image.load('../img/vaults/vault_half2.png')
+        self.image = pg.image.load(State.MAP_DIR / 'vaults' / 'vault_half2.png')
 
         self.rect = self.image.get_rect()
         self.rect.x = 800
@@ -63,15 +65,15 @@ class Vault:
         self.door_group = pg.sprite.Group()
         self.secondary_door = SecondaryDoor(self.door_group)
         self.main_door = MainDoor((
-            pg.image.load('../img/vaults/vault_half1.png'),
-            pg.image.load('../img/vaults/vault.png'),
-            pg.image.load('../img/vaults/vault1.png'),
-            pg.image.load('../img/vaults/vault2.png'),
-            pg.image.load('../img/vaults/vault3.png'),
-            pg.image.load('../img/vaults/vault4.png'),
-            pg.image.load('../img/vaults/vault5.png'),
-            pg.image.load('../img/vaults/vault6.png'),
-            pg.image.load('../img/vaults/vault7.png')), self.door_group)
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault_half1.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault1.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault2.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault3.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault4.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault5.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault6.png'),
+            pg.image.load(State.MAP_DIR / 'vaults' / 'vault7.png')), self.door_group)
 
         # self.is_opening_sound_played = False
         # self.is_open_sound_played = False
@@ -84,7 +86,7 @@ class Vault:
         return self.is_process
 
     def open_vault(self):
-        pg.mixer.music.load('../sounds/vault_process.mp3')
+        pg.mixer.music.load(State.SOUND_DIR / 'vault_process.mp3')
         pg.mixer.music.play()
 
         self.is_process = True
@@ -99,7 +101,7 @@ class Vault:
         self.action_tick_start = pg.time.get_ticks()
 
     def close_vault(self):
-        pg.mixer.music.load('../sounds/vault_process.mp3')
+        pg.mixer.music.load(State.SOUND_DIR / 'vault_process.mp3')
         pg.mixer.music.play()
 
         self.is_process = True
@@ -131,7 +133,7 @@ class Vault:
 
                     if frame_index != self.main_door.get_frame_index():
                         if frame_index >= self.main_door.get_frame_count():
-                            pg.mixer.music.load('../sounds/vault_opened.mp3')
+                            pg.mixer.music.load(State.SOUND_DIR / 'vault_opened.mp3')
                             pg.mixer.music.play()
 
                             self.is_moving = True
