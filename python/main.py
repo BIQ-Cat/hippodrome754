@@ -3,17 +3,34 @@ import pygame as pg
 from map import Map
 from portal import Portal
 from countdown_timer import Timer
+from vault import Vault
+from scoreboard import Scoreboard
 from state import State
 from landscape import Landscape
 from camera import Camera
 
-def play(maps: Map, minutes: int, seconds: int, screen: pg.Surface, clock: pg.time.Clock):
+def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
+    minutes = 7 - (level % 5 - 1) // 2 + level // 5
+    seconds = 30 * (level % 5 % 2)
+    
     state = State(Camera())
 
     timer = Timer(screen, state, minutes, seconds)
-    portal = Portal(460, 460, state)
+    
+    if level == 0:
+        portal = Portal(200, 200, state)
+    else:
+        portal = Portal(400, 400, state)
+    
+    if level == 0:
+        maps = Map(2, 4)    
+    else:
+        maps = Map(((level // 5 + 1) * 10), ((level // 5 + 1) * 20))
 
     landscape = Landscape(screen, state, maps, state.MAP_RESOLUTION, portal)
+    
+    if level != 0:
+        vault.open_vault()
     
     running = True
     while running:
@@ -31,6 +48,8 @@ def play(maps: Map, minutes: int, seconds: int, screen: pg.Surface, clock: pg.ti
 
         timer.draw()
         
+        vault.update()
+        
         if landscape.check_win(portal):
             return True
         if state.lost:
@@ -39,51 +58,82 @@ def play(maps: Map, minutes: int, seconds: int, screen: pg.Surface, clock: pg.ti
         clock.tick(state.FPS)
         pg.display.flip()
 
+    scoreboard = Scoreboard(level)
+    scoreboard.show(screen)
+    
+    pg.mixer.quit()
     pg.quit()
     exit()
+    
 
 if __name__ == '__main__':
     pg.init()
+    pg.mixer.init()
 
-    screen = pg.display.set_mode((State.SCREEN_WIDTH, State.SCREEN_HEIGHT), pg.SCALED)
+    screen = pg.display.set_mode((State.SCREEN_WIDTH, State.SCREEN_HEIGHT), pg.SCALED, vsync=1)
     clock = pg.time.Clock()
+    vault = Vault(screen)
 
     win_screen = pg.image.load(State.MAP_DIR / "win.png")
     lose_screen = pg.image.load(State.MAP_DIR / "lose.png")
 
-    level = 5
+    level = 0
 
-    while level != 6:
-        minutes = 7 - (level - 1) // 2
-        seconds = 30 * (level % 2)
+    while True:       
+        pg.display.set_caption(f"Уровень {level}")
         
-        maps = Map(5 + (level * 5), 10 + (level * 5))
-        
-        won = play(maps, minutes, seconds, screen, clock)
-        res_img = win_screen if won else lose_screen
-
-        screen.blit(res_img, res_img.get_rect(center=screen.get_rect().center))
-        pg.display.flip()
-
-        closed = False
-
-        while not closed:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    closed = True
+        if level == 0:
+            help_screen = pg.image.load(State.MAP_DIR / "shambala.png")
+            screen.blit(help_screen, help_screen.get_rect(center=screen.get_rect().center))
+            pg.display.flip()
+            
+            closed = False
+            run = True
+            while not closed and run:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        closed = False
+                    if event.type == pg.KEYDOWN or event.type == pg.MOUSEBUTTONDOWN:
+                        run = False
                 
-                btn = pg.key.get_pressed()
-                if btn[pg.K_q]:
-                    closed = True
-                if btn[pg.K_e]:
+            if closed:
+                break
+            
+        
+        won = play(screen, clock, level, vault)
+        
+        closed = False
+        
+        if won:
+            vault.close_vault()
+            while not closed:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        closed = True
+                
+                vault.update()
+                pg.display.flip()
+                
+                if not vault.get_vault_process():
                     break
                 
                 clock.tick(State.FPS)
-        
-        if closed:
-            break
+        else:
+            screen.blit(lose_screen, lose_screen.get_rect(center=screen.get_rect().center))
+            pg.display.flip()
 
-        if won:
-            level += 1
+            while not closed:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT or event.type == pg.KEYDOWN or event.type == pg.MOUSEBUTTONDOWN:
+                        closed = True
         
+        if closed or not won:
+            break
+        else:
+            level += 1
+    
+    scoreboard = Scoreboard(level)
+    scoreboard.show(screen)
+    
+    pg.mixer.quit()
     pg.quit()
