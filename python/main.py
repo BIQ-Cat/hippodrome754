@@ -3,6 +3,7 @@ import pygame as pg
 from map import Map
 from portal import Portal
 from countdown_timer import Timer
+from methronome import Methronome
 from vault import Vault
 from scoreboard import Scoreboard
 from state import State
@@ -16,6 +17,7 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
     state = State(Camera())
 
     timer = Timer(screen, state, minutes, seconds)
+    methronome = Methronome(screen, timer)
     
     if level == 0:
         portal = Portal(200, 200, state)
@@ -47,6 +49,7 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
         landscape.render()
 
         timer.draw()
+        methronome.update()
         
         vault.update()
         
