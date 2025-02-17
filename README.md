@@ -54,4 +54,4 @@ python python\main.py
 
 ВНИМАНИЕ! ДЛЯ СОХРАНЕНИЯ РЕЗУЛЬТАТОВ ЗАПУСКАЙТЕ ИГРУ ИЗ ОДНОЙ И ТОЙ ЖЕ ПАПКИ, ИНАЧЕ ЕСТЬ ШАНС ВСЁ ПОТЕРЯТЬ!
 
-При создании воксельного движка за основу был взят Voxel Space Render: [https://github.com/StanislavPetrovV/Voxel-Space-Render]
+При создании воксельного движка за основу был взят Voxel Space Render ([GitHub](https://github.com/StanislavPetrovV/Voxel-Space-Render))
