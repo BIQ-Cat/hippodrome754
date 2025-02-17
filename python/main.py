@@ -35,6 +35,8 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
         vault.open_vault()
     
     running = True
+
+    vault_opened = False    
     while running:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -52,6 +54,10 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
         methronome.update()
         
         vault.update()
+
+        if not vault_opened and not vault.get_vault_process():
+            pg.mixer.music.play(-1)
+            vault_opened = True
         
         if landscape.check_win(portal):
             return True
@@ -60,6 +66,8 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
 
         clock.tick(state.FPS)
         pg.display.flip()
+    
+    pg.mixer.music.stop()
 
     scoreboard = Scoreboard(level)
     scoreboard.show(screen)
@@ -72,6 +80,7 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
 if __name__ == '__main__':
     pg.init()
     pg.mixer.init()
+    pg.mixer.music.load(State.SOUND_DIR / "main.ogg") 
 
     screen = pg.display.set_mode((State.SCREEN_WIDTH, State.SCREEN_HEIGHT), pg.SCALED, vsync=1)
     clock = pg.time.Clock()
@@ -105,6 +114,7 @@ if __name__ == '__main__':
             
         
         won = play(screen, clock, level, vault)
+        pg.mixer.music.stop()
         
         closed = False
         

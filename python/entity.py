@@ -1,5 +1,6 @@
 import abc
 import numpy
+import pygame
 
 from state import State
 
@@ -10,6 +11,8 @@ class Entity(abc.ABC):
         self.pos_y = y
         self.resolution = resolution
         self.state = state
+        self.terraforming_sound = pygame.mixer.Sound(self.state.SOUND_DIR / "terraforming.wav")
+        self.terraforming_sound.set_volume(0.05)
 
     @abc.abstractmethod
     def get_color_map(self) -> numpy.ndarray:
@@ -49,6 +52,8 @@ class Entity(abc.ABC):
                     height_map[x, y] = height_map[x, y] - 1
                 elif height_map[x, y] & self.state.GET_HEIGHT < self.state.ZERO_LAYER_HEIGHT:
                     height_map[x, y] = height_map[x, y] + 1
+        
+        self.terraforming_sound.play()
         
         return height_map
 
