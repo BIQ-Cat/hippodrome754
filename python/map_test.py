@@ -1,8 +1,8 @@
 import pygame as pg
 
-from state import State
-from camera import Camera
-from map import Map
+from .state import State
+from .camera import Camera
+from .map import Map
 
 if __name__ == '__main__':
     pg.init()

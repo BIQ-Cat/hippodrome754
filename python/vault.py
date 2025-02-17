@@ -1,6 +1,6 @@
 import pygame as pg
 
-from state import State
+from .state import State
 
 
 class MainDoor(pg.sprite.Sprite):
@@ -82,12 +82,14 @@ class Vault:
         self.is_opening = False
         self.is_moving = False
 
+        self.sound_process = pg.mixer.Sound(State.SOUND_DIR / "vault_process.mp3")
+        self.sound_opened = pg.mixer.Sound(State.SOUND_DIR / "vault_opened.mp3")
+
     def get_vault_process(self):
         return self.is_process
 
     def open_vault(self):
-        pg.mixer.music.load(State.SOUND_DIR / 'vault_process.mp3')
-        pg.mixer.music.play()
+        self.sound_process.play()
 
         self.is_process = True
         self.is_opening = True
@@ -101,8 +103,7 @@ class Vault:
         self.action_tick_start = pg.time.get_ticks()
 
     def close_vault(self):
-        pg.mixer.music.load(State.SOUND_DIR / 'vault_process.mp3')
-        pg.mixer.music.play()
+        self.sound_process.play()
 
         self.is_process = True
         self.is_opening = False
@@ -133,8 +134,7 @@ class Vault:
 
                     if frame_index != self.main_door.get_frame_index():
                         if frame_index >= self.main_door.get_frame_count():
-                            pg.mixer.music.load(State.SOUND_DIR / 'vault_opened.mp3')
-                            pg.mixer.music.play()
+                            self.sound_opened.play()
 
                             self.is_moving = True
 

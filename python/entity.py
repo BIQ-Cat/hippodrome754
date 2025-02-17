@@ -2,7 +2,7 @@ import abc
 import numpy
 import pygame
 
-from state import State
+from .state import State
 
 
 class Entity(abc.ABC):

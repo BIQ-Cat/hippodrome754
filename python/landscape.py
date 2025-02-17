@@ -6,12 +6,12 @@ import pathlib
 import numpy
 import pygame as pg
 
-from map import Map
-from entity import Entity
-from core import Core
-from frame import Frame
-from portal import Portal
-from state import State
+from .map import Map
+from .entity import Entity
+from .core import Core
+from .frame import Frame
+from .portal import Portal
+from .state import State
 
 
 class Camera(ctypes.Structure):

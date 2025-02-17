@@ -1,14 +1,15 @@
 import pygame as pg
+import sys
 
-from map import Map
-from portal import Portal
-from countdown_timer import Timer
-from methronome import Methronome
-from vault import Vault
-from scoreboard import Scoreboard
-from state import State
-from landscape import Landscape
-from camera import Camera
+from python.map import Map
+from python.portal import Portal
+from python.countdown_timer import Timer
+from python.methronome import Methronome
+from python.vault import Vault
+from python.scoreboard import Scoreboard
+from python.state import State
+from python.landscape import Landscape
+from python.camera import Camera
 
 def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
     minutes = 7 - (level % 5 - 1) // 2 + level // 5
@@ -74,15 +75,18 @@ def play(screen: pg.Surface, clock: pg.time.Clock, level: int, vault: Vault):
     
     pg.mixer.quit()
     pg.quit()
-    exit()
+    sys.exit()
     
 
 if __name__ == '__main__':
     pg.init()
     pg.mixer.init()
-    pg.mixer.music.load(State.SOUND_DIR / "main.ogg") 
+    pg.mixer.music.load(State.SOUND_DIR / "main.ogg")
 
-    screen = pg.display.set_mode((State.SCREEN_WIDTH, State.SCREEN_HEIGHT), pg.SCALED, vsync=1)
+    icon = pg.image.load(State.MAP_DIR / "frame_color_map.jpg")
+    pg.display.set_icon(icon)
+
+    screen = pg.display.set_mode((State.SCREEN_WIDTH, State.SCREEN_HEIGHT), pg.SCALED)
     clock = pg.time.Clock()
     vault = Vault(screen)
 

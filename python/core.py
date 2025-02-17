@@ -2,9 +2,8 @@ import numpy
 import pygame
 from PIL import Image
 
-from entity import Entity
-from camera import Camera
-from state import State
+from .entity import Entity
+from .state import State
 
 
 class Core(Entity):

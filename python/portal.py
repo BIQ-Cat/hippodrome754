@@ -1,8 +1,8 @@
 import numpy
 from PIL import Image
 
-from entity import Entity
-from state import State
+from .entity import Entity
+from .state import State
 
 
 class Portal(Entity):

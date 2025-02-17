@@ -3,7 +3,7 @@ import pathlib
 
 import pygame as pg
 
-from camera import Camera
+from .camera import Camera
 
 
 class State:

@@ -1,7 +1,7 @@
 import numpy
 import pygame
 
-from countdown_timer import Timer
+from .countdown_timer import Timer
 
 class Ball(pygame.sprite.Sprite):
     def __init__(self, x: int, y: int, timer: Timer, *groups: pygame.sprite.Group) -> None:
@@ -26,7 +26,7 @@ class Ball(pygame.sprite.Sprite):
     
     def update(self, methronome_walls: pygame.sprite.Group, *args):
         self.rect = self.rect.move(self.vel, 0)
-        if pygame.sprite.spritecollideany(self, methronome_walls):
+        if pygame.sprite.spritecollideany(self, methronome_walls): # type: ignore
             self.vel = -self.vel
         
         if self.timer.minutes < self.last_minute:
